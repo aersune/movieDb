@@ -47,7 +47,7 @@ class HomeScreen extends StatelessWidget {
                     genres: state.genresList,
                     title: 'Сейчас смотрят',
                   ),
-                  TvSeriesList(series: state.tvSeries?.results, title: 'Serials', genres: state.genresList)
+                  TvSeriesList(series: state.tvSeries?.results, title: 'Serials',)
                   // MoviesListWidget(),
                   // MoviesListWidget(),
                 ],

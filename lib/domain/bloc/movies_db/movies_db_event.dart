@@ -20,6 +20,12 @@ final class MoviesDetailsEvent extends MoviesDbEvent {
 }
 
 
+final class TvSeriesDetailsEvent extends MoviesDbEvent {
+  final int idMovie;
+
+  TvSeriesDetailsEvent({required this.idMovie,});
+}
+
 
 
 

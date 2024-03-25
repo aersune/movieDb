@@ -64,6 +64,28 @@ final class DetailsLoadedState extends MoviesDbState {
     );
   }
 }
+final class TvSeriesDetailsLoadedState extends MoviesDbState {
+  final TvSeriesDetails? seriesDetails;
+  final Credits? credits;
+  final TvSeries? recommendSeries;
+
+
+  TvSeriesDetailsLoadedState({ this.seriesDetails,  this.credits,  this.recommendSeries,});
+
+  TvSeriesDetailsLoadedState copyWith({
+    TvSeriesDetails? seriesDetails,
+    Credits? credits,
+    TvSeries? recommendSeries,
+
+  }) {
+    return TvSeriesDetailsLoadedState(
+        seriesDetails: seriesDetails ?? this.seriesDetails,
+        credits: credits ?? this.credits,
+      recommendSeries: recommendSeries ?? this.recommendSeries,
+
+    );
+  }
+}
 
 final class MoviesErrorState extends MoviesDbState {
   final String error;

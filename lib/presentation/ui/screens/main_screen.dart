@@ -35,35 +35,44 @@ class MainScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.mainDark,
       body: navigationShell,
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index){
-          context.read<MoviesDbBloc>().add(MoviesLoadEvent());
-         // if(index < 4) {
-           _goToBranch(index);
-         // }
-          context.read<NavigateProvider>().changePage(page: index);
-        },
-          currentIndex: context.watch<NavigateProvider>().pageIndex,
-          backgroundColor: AppColors.appDark,
-          items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_filled, color: Colors.red,),
-          label: ''
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard_rounded,color: Colors.red,),
-            label: ''
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bookmark_outline,color: Colors.red,),
-            label: ''
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings,color: Colors.red,),
-            label: ''
-        ),
+      bottomNavigationBar: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: AppColors.mainDark,
+          primaryColor: Colors.blue,
 
-      ]),
+        ),
+        child: BottomNavigationBar(
+          showSelectedLabels: false,
+         showUnselectedLabels: false,
+          onTap: (index){
+            context.read<MoviesDbBloc>().add(MoviesLoadEvent());
+           // if(index < 4) {
+             _goToBranch(index);
+           // }
+            context.read<NavigateProvider>().changePage(page: index);
+          },
+            currentIndex: context.watch<NavigateProvider>().pageIndex,
+            backgroundColor: AppColors.appDark,
+            items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_filled, color: Colors.red,),
+            label: ''
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_rounded,color: Colors.red,),
+              label: ''
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_outline,color: Colors.red,),
+              label: ''
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings,color: Colors.red,),
+              label: ''
+          ),
+
+        ]),
+      ),
 
       // CupertinoTabScaffold(
       //

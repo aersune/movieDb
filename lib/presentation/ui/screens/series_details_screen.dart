@@ -3,17 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/credits_model.dart';
+import 'package:movie_db/domain/models/tv_series_details.dart';
+
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';
+import 'package:movie_db/presentation/ui/widgets/tv_series_list.dart';
 
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/movie_details.dart';
-import '../../router/app_routes.dart';
 import '../widgets/actors_images_widget.dart';
 
-class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
+class TvSeriesDetailsScreen extends StatelessWidget {
+  const TvSeriesDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +30,8 @@ class DetailsScreen extends StatelessWidget {
             SingleChildScrollView(
               child: BlocBuilder<MoviesDbBloc, MoviesDbState>(
                 builder: (context, state) {
-                  if (state is DetailsLoadedState) {
-                    final MovieDetails? details = state.movieDetails;
+                  if (state is TvSeriesDetailsLoadedState) {
+                    final TvSeriesDetails? details = state.seriesDetails;
                     final Credits? credits = state.credits;
                     print("${details?.id} id");
                     return Column(
@@ -62,10 +64,10 @@ class DetailsScreen extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "${details?.title}",
+                                      "${details?.name}",
                                       style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                     ),
-                                    Text("2024 · 1 ч 10 мин", style: AppStyle.normalStyle.copyWith(fontSize: 12)),
+                                    Text("2024 · Season ${details?.lastEpisodeToAir?.seasonNumber} serie ${details?.lastEpisodeToAir?.episodeNumber}", style: AppStyle.normalStyle.copyWith(fontSize: 14)),
                                     Text("${details?.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
                                         style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7)),
                                     const SizedBox(height: 15),
@@ -117,7 +119,7 @@ class DetailsScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 15),
-                        ratingWidget(details?.voteAverage ?? 0.0),
+                        ratingWidget(details?.voteAverage ?? 0.0, details!.numberOfEpisodes ?? 0, details.numberOfSeasons?? 0),
                         const SizedBox(height: 15),
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -127,7 +129,7 @@ class DetailsScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "${details?.overview}",
+                                "${details.overview}",
                                 style: AppStyle.normalStyle,
                                 maxLines: 8,
                                 overflow: TextOverflow.ellipsis,
@@ -145,22 +147,22 @@ class DetailsScreen extends StatelessWidget {
                               creditsWidget(
                                   title: 'Writing ',
                                   body: credits.crew!.where((el) => el.department == "Writing").map((e) => e.name).join(',  ')),
-      
+
                               const SizedBox(height: 10),
                               const Text('Actors:', style: AppStyle.titleStyle,),
                               const SizedBox(height: 10),
                               ActorsAvatars(cast: credits.cast,),
                               const SizedBox(height: 50),
 
-                              MoviesListWidget(
-                                movies: state.recommendMovies?.results,
-                                genres: state.genresList,
+                              TvSeriesList(
+                                series: state.recommendSeries?.results,
+
                                 title: 'Recommend Movies',
                               ),
                             ],
                           ),
                         ),
-      
+
                         // const MoviesListWidget()
                       ],
                     );
@@ -183,20 +185,19 @@ class DetailsScreen extends StatelessWidget {
                   }
                 },
               ),
-      
+
             ),
             Positioned(
                 top: 30,
                 left: 20,
                 child: InkWell(
                   onTap: () {
-      
+
 
                     // Navigator.pop(context);
-context.pop();
 
 
-                    // context.go('/home');
+                    context.pop('/home');
 
                     context.read<MoviesDbBloc>().add(MoviesLoadEvent());
                   },
@@ -225,19 +226,19 @@ context.pop();
           text: TextSpan(
               style: const TextStyle(height: 1.3),
               children: [
-        TextSpan(
-          text: "$title: ",
-          style: AppStyle.normalStyle,
-        ),
-        TextSpan(
-          text: body,
-          style: AppStyle.normalStyle.copyWith(color: AppColors.grayText),
-        ),
-      ])),
+                TextSpan(
+                  text: "$title: ",
+                  style: AppStyle.normalStyle,
+                ),
+                TextSpan(
+                  text: body,
+                  style: AppStyle.normalStyle.copyWith(color: AppColors.grayText),
+                ),
+              ])),
     );
   }
 
-  Widget ratingWidget(double votes) {
+  Widget ratingWidget(double votes, int episodes, int seasons) {
     return Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -261,12 +262,12 @@ context.pop();
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'No data',
-            style: AppStyle.titleStyle.copyWith(fontSize: 12),
+            "Seasons $seasons",
+            style: AppStyle.titleStyle.copyWith(fontSize: 15),
           ),
           Text(
-            'Кинопоиск',
-            style: AppStyle.titleStyle.copyWith(fontSize: 13),
+            "Episodes $episodes",
+            style: AppStyle.titleStyle.copyWith(fontSize: 15),
           ),
         ],
       ),

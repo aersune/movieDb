@@ -29,6 +29,7 @@ class MoviesGridWidget extends StatelessWidget {
           mainAxisExtent: 210
         ),
         itemBuilder: (context, index){
+        final mov = movies?[index];
           return InkWell(
             onTap: (){
               print(movies?[index].id);

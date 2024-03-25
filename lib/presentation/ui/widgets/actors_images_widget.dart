@@ -14,7 +14,7 @@ class ActorsAvatars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  SizedBox(
-      height: 150,
+      height: 165,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         separatorBuilder: (context, index) => const SizedBox(width: 10),
@@ -35,7 +35,12 @@ class ActorsAvatars extends StatelessWidget {
                 ),
               ),
               Text("${cast?[i].name}", style: AppStyle.normalStyle.copyWith(fontSize: 15),),
-              Text("${cast?[i].character}", style: AppStyle.normalStyle.copyWith(fontSize: 15, color: AppColors.grayText),),
+              Text(
+
+                "${cast?[i].character?.replaceAll('/', "\n-")}",
+                style: AppStyle.normalStyle.copyWith(fontSize: 15, color: AppColors.grayText, ),
+              textAlign: TextAlign.center,
+              ),
             ],
           );
         }

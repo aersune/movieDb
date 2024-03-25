@@ -22,9 +22,6 @@ class AppNavigation {
   static final _rootNavigatorSearch = GlobalKey<NavigatorState>(debugLabel: 'shellSearch');
   static final _rootNavigatorLibrary = GlobalKey<NavigatorState>(debugLabel: 'shellLibrary');
   static final _rootNavigatorSetting = GlobalKey<NavigatorState>(debugLabel: 'shellSetting');
-  static final _rootNavigatorSlider = GlobalKey<NavigatorState>(debugLabel: 'shellSlider');
-  static final _rootNavigatorGrid = GlobalKey<NavigatorState>(debugLabel: 'shellGrid');
-  static final _rootNavigatorList = GlobalKey<NavigatorState>(debugLabel: 'shellGrid');
 
   static final GoRouter router = GoRouter(
       initialLocation: initR,
@@ -33,6 +30,7 @@ class AppNavigation {
       routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
           builder: (context, state, navigatorShell) {
+
             return MainScreen(navigationShell: navigatorShell,);
           },
           branches: <StatefulShellBranch>[
@@ -111,33 +109,9 @@ class AppNavigation {
                     );
                   })
                 ]),
-            // StatefulShellBranch(
-            //     navigatorKey: _rootNavigatorSlider,
-            //     routes: [
-            //       GoRoute(path: '/slider',name: 'slider', builder: (context, state) {
-            //         return SettingsScreen(
-            //           key: state.pageKey,
-            //         );
-            //       },routes: [
-            //           GoRoute(path: 'details2', name: "details2",builder:  (context, state) {
-            //             return DetailsScreen(key: state.pageKey,);
-            //           })
-            //       ])
-            //     ]),
-            // StatefulShellBranch(
-            //     navigatorKey: _rootNavigatorGrid,
-            //     routes: [
-            //       GoRoute(path: '/movsGrid',name: 'movsGrid', builder: (context, state) {
-            //         return SettingsScreen(
-            //           key: state.pageKey,
-            //         );
-            //       },routes: [
-            //         GoRoute(path: 'searchDetails', name: "searchDetails",builder:  (context, state) {
-            //           return DetailsScreen(key: state.pageKey,);
-            //         })
-            //       ])
-            //     ]),
 
-          ])
+
+          ]),
+
   ]);
 }

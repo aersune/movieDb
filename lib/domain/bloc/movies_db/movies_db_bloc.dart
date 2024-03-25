@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:movie_db/domain/models/tv_series_details.dart';
 
 import '../../api/api_repository.dart';
 import '../../models/credits_model.dart';
@@ -46,6 +47,18 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
         emit(currentState.copyWith(sliderIndex: event.sliderIndex));
       } else {
         emit(MoviesLoadedState(sliderIndex: event.sliderIndex));
+      }
+    });
+    on<TvSeriesDetailsEvent>((event, emit) async{
+      try{
+        final TvSeriesDetails tvSeriesDetails = await apiRepository.getAllTvSeriesDetails(event.idMovie);
+        final Credits credits = await apiRepository.getAllSerialCredits(event.idMovie);
+        final TvSeries recommend = await apiRepository.getAllRecommendSeries(event.idMovie);
+
+        emit(TvSeriesDetailsLoadedState(seriesDetails: tvSeriesDetails, credits: credits, recommendSeries: recommend));
+
+      } catch(_){
+
       }
     });
 
