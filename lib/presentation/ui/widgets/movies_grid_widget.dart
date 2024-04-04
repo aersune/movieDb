@@ -6,6 +6,7 @@ import 'package:movie_db/presentation/router/app_routes.dart';
 
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/genres.dart';
+import '../../../domain/provider.dart';
 import '../../components/app_style.dart';
 
 class MoviesGridWidget extends StatelessWidget {
@@ -34,6 +35,7 @@ class MoviesGridWidget extends StatelessWidget {
             onTap: (){
               print(movies?[index].id);
               context.read<MoviesDbBloc>().add(MoviesDetailsEvent(idMovie: movies?[index].id ?? 0, ));
+              context.read<MoviesProvider>().firstDetailsId = movies![0].id!;
               context.pushNamed('searchDetails');
             },
             child: Column(

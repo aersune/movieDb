@@ -38,8 +38,8 @@ class SliderWidget extends StatelessWidget {
                 height: size.height * .6,
                 autoPlay: true,
                 viewportFraction: 1,
-                enlargeFactor: 0.2,
-                aspectRatio: 2.0,
+                enlargeFactor: .2,
+                aspectRatio: 5,
                 enlargeCenterPage: true,
               ),
             ),
@@ -63,7 +63,9 @@ class SliderWidget extends StatelessWidget {
                           end: Alignment.bottomCenter,
                           colors: [AppColors.mainDark.withOpacity(0.0), AppColors.mainDark])),
                 )),
-            Positioned(bottom: 15, child: centerWidget(widget: sliderTitle(context, movie: result), size: size)),
+            Positioned(bottom: 15, child: centerWidget(widget: SizedBox(
+                width: size.width,
+                child: sliderTitle(context, movie: result)), size: size)),
           ],
         ),
         const SizedBox(height: 5),
@@ -77,14 +79,16 @@ class SliderWidget extends StatelessWidget {
       builder: (context, state) {
 
         if (state is MoviesLoadedState) {
-          // print(state.genresList?.genres.first);
           final Results? movie = state.popularMovies!.results?[state.sliderIndex ?? 0];
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
+
                 "${state.popularMovies!.results?[state.sliderIndex ?? 0].title}",
                 style: AppStyle.titleStyle,
+                textAlign: TextAlign.center,
+                maxLines: 2,
               ),
               Text(
                 "${state.genresList?.genres?.where((element) => element.id == movie?.genreIds?[0]).first.name} · ${movie?.releaseDate?.substring(0, 4)}",
@@ -93,10 +97,7 @@ class SliderWidget extends StatelessWidget {
               const SizedBox(height: 10),
               InkWell(
                 onTap: () {
-                  // context.go(AppRoutes.details);
                   context.read<MoviesDbBloc>().add(MoviesDetailsEvent(idMovie: movie?.id ?? 0));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsScreen()));
-                  // context.push(AppRoutes.details);
                   context.pushNamed('details2');
 
                 },

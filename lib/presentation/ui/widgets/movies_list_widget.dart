@@ -6,6 +6,7 @@ import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/popular_movies.dart';
+import '../../../domain/provider.dart';
 
 class MoviesListWidget extends StatelessWidget {
   const MoviesListWidget({
@@ -64,6 +65,7 @@ class MoviesListWidget extends StatelessWidget {
                     return InkWell(
                       onTap: (){
                         context.read<MoviesDbBloc>().add(MoviesDetailsEvent(idMovie: movies?[index].id ?? 0, ));
+                        context.read<MoviesProvider>().firstDetailsId = movies![index].id!;
                         context.pushNamed('movlistDetails');
                       },
                       child: Column(
@@ -95,7 +97,8 @@ class MoviesListWidget extends StatelessWidget {
                           ),
                           Text(
                               "${genres?.genres?.where((g) => g.id == movies![0].genreIds?[0]).first.name} · ${movies?[index].releaseDate?.substring(0, 4)}",
-                              style: AppStyle.normalStyle),
+                              style: AppStyle.normalStyle,
+                          ),
                         ],
                       ),
                     );

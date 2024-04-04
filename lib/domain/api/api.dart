@@ -2,7 +2,10 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:movie_db/domain/models/countries_model.dart';
+import 'package:movie_db/domain/models/search_results_model.dart';
 import 'package:movie_db/domain/models/tv_series_details.dart';
+import 'package:movie_db/domain/models/user_data_model.dart';
 
 import '../models/credits_model.dart';
 import '../models/genres.dart';
@@ -15,6 +18,16 @@ class Api {
   // ?language=ru-RU
   static final apiKey = dotenv.get('API_KEY');
   static final dio = Dio();
+  // https://api.themoviedb.org/3/account?api_key=blahblahblah&session_id=xxxxxxxxxxx
+
+  static Future<UserData> getProfileInfo(String sessionId) async{
+    final response = await dio.get('https://api.themoviedb.org/3/account?api_key=${Api.apiKey}&session_id=$sessionId');
+    if(response.statusCode == 200){
+      return UserData.fromJson(response.data);
+    }else{
+      throw Exception('Error ${response.statusCode}');
+    }
+  }
 
   static Future<MoviesModel> getPopularMovies() async{
     final response = await dio.get('https://api.themoviedb.org/3/movie/popular?api_key=${Api.apiKey}');
@@ -40,6 +53,14 @@ class Api {
         throw Exception('Error ${response.statusCode}');
       }
    }
+  static Future<GenresList> getGenresTv()  async{
+    final response = await dio.get('https://api.themoviedb.org/3/genre/tv/list?api_key=${Api.apiKey}');
+    if(response.statusCode == 200){
+      return GenresList.fromJson(response.data);
+    }else{
+      throw Exception('Error ${response.statusCode}');
+    }
+  }
    
    static Future<MovieDetails> getMovieDetails(int id)  async{
       final response = await dio.get('https://api.themoviedb.org/3/movie/$id?api_key=${Api.apiKey}');
@@ -99,22 +120,29 @@ class Api {
       throw Exception('Error ${response.statusCode}');
     }
   }
-  static Future<MoviesModel> getMovSearchResult(String query) async{
-    final response = await dio.get('https://api.themoviedb.org/3/search/movie?api_key=${Api.apiKey}');
+
+  static Future<SearchResultsModel> getSearchResult(String query) async{
+    final response = await dio.get('https://api.themoviedb.org/3/search/multi?api_key=${Api.apiKey}&query=$query');
     if(response.statusCode == 200) {
-      return MoviesModel.fromJson(response.data);
+      return SearchResultsModel.fromJson(response.data);
     }else{
       throw Exception('Error ${response.statusCode}');
     }
   }
-  static Future<TvSeries> getTvSearchResult(String query) async{
-    final response = await dio.get('https://api.themoviedb.org/3/search/tv&$query?api_key=${Api.apiKey}');
+  static Future<List<Countries>> getCountries() async{
+    final response = await dio.get('https://api.themoviedb.org/3/configuration/countries?api_key=${Api.apiKey}');
     if(response.statusCode == 200) {
-      return TvSeries.fromJson(response.data);
+      Iterable list = response.data;
+      return list.map((e) => Countries.fromJson(e)).toList();
     }else{
       throw Exception('Error ${response.statusCode}');
     }
   }
+
+
+
+
+
 
 
 }

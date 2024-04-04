@@ -8,6 +8,7 @@ final class MoviesLoadEvent extends MoviesDbEvent {}
 final class SliderIndexChangedEvent extends MoviesDbEvent {
   final int sliderIndex;
   SliderIndexChangedEvent({required this.sliderIndex});
+
 }
 
 
@@ -20,10 +21,18 @@ final class MoviesDetailsEvent extends MoviesDbEvent {
 }
 
 
+
+final class MoviesSearchEvent extends MoviesDbEvent {
+   final String query;
+   MoviesSearchEvent({required this.query});
+}
+
+
 final class TvSeriesDetailsEvent extends MoviesDbEvent {
   final int idMovie;
 
   TvSeriesDetailsEvent({required this.idMovie,});
+
 }
 
 

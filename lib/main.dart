@@ -6,12 +6,17 @@ import 'package:movie_db/domain/api/api_repository.dart';
 import 'package:movie_db/domain/bloc/movies_db/movies_db_bloc.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
+import 'package:movie_db/presentation/components/my_app_model.dart';
 import 'package:movie_db/presentation/router/app_navigation.dart';
-import 'package:movie_db/presentation/router/app_router.dart';
-import 'package:movie_db/presentation/ui/screens/main_screen.dart';
+
 import 'package:provider/provider.dart';
 
+import 'domain/models/auth_model.dart';
+
+
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -19,15 +24,27 @@ void main() async {
         systemNavigationBarColor: AppColors.appDark,
       )
   );
-  runApp(const MyApp());
+  final model = MyAppModel();
+  await model.checkAuth();
+
+  runApp( MyApp(model: model,));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+
+  const MyApp({super.key, required this.model});
+
+  final MyAppModel model;
 
   @override
   Widget build(BuildContext context) {
+
+
     final apiRepository = ApiRepository();
+
+    // final prov = context.watch<MoviesProvider>();
+// AppNavigation.initR
+    AppNavigation.initR = model.isAuth ? '/home' : '/login';
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -35,7 +52,7 @@ class MyApp extends StatelessWidget {
           MoviesDbBloc(apiRepository)
             ..add(MoviesLoadEvent()),
         ),
-        ChangeNotifierProvider(create: (context) => NavigateProvider()),
+        ChangeNotifierProvider(create: (context) => MoviesProvider()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -44,7 +61,8 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        routerConfig: AppNavigation.router,
+        routerConfig:   AppNavigation.router ,
+
       ),
     );
   }

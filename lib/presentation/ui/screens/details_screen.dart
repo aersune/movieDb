@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/credits_model.dart';
+import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';
 
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/movie_details.dart';
-import '../../router/app_routes.dart';
+
 import '../widgets/actors_images_widget.dart';
 
 class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
+  const DetailsScreen({super.key, this.inSearch = false});
+
+  final bool inSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +27,6 @@ class DetailsScreen extends StatelessWidget {
         color: AppColors.mainDark,
         child: Stack(
           children: [
-
             SingleChildScrollView(
               child: BlocBuilder<MoviesDbBloc, MoviesDbState>(
                 builder: (context, state) {
@@ -34,7 +36,6 @@ class DetailsScreen extends StatelessWidget {
                     print("${details?.id} id");
                     return Column(
                       children: [
-
                         Container(
                           width: size.width,
                           height: 570,
@@ -66,8 +67,9 @@ class DetailsScreen extends StatelessWidget {
                                       style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                     ),
                                     Text("2024 · 1 ч 10 мин", style: AppStyle.normalStyle.copyWith(fontSize: 12)),
-                                    Text("${details?.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
-                                        style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7)),
+                                    details!.productionCountries!.isNotEmpty ?
+                                    Text("${details.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
+                                        style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7)) : const SizedBox(),
                                     const SizedBox(height: 15),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,25 +135,39 @@ class DetailsScreen extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 10),
-                              creditsWidget(
-                                  title: 'Directing ',
-                                  body: credits!.crew!.where((el) => el.department == "Directing").map((e) => e.name).join(',  ')),
-                              creditsWidget(
-                                  title: 'Cast ',
-                                  body: credits.cast!.take(15).map((e) => e.name).join(',  ')),
-                              creditsWidget(
-                                  title: 'Production ',
-                                  body: credits.crew!.where((el) => el.department == "Production").take(15).map((e) => e.name).join(',  ')),
-                              creditsWidget(
-                                  title: 'Writing ',
-                                  body: credits.crew!.where((el) => el.department == "Writing").map((e) => e.name).join(',  ')),
-      
+                              credits!.crew!.isEmpty ?
+                                  const SizedBox() :
+                              Column(
+                                children: [
+                                  creditsWidget(
+                                      title: 'Directing ',
+                                      body: credits!.crew!.where((el) => el.department == "Directing").map((e) => e.name).join(',  ')),
+                                  creditsWidget(title: 'Cast ', body: credits.cast!.take(15).map((e) => e.name).join(',  ')),
+                                  creditsWidget(
+                                      title: 'Production ',
+                                      body: credits.crew!.where((el) => el.department == "Production").take(15).map((e) => e.name).join(',  ')),
+                                  creditsWidget(
+                                      title: 'Writing ',
+                                      body: credits.crew!.where((el) => el.department == "Writing").map((e) => e.name).join(',  ')),
+                                ],
+                              ),
                               const SizedBox(height: 10),
-                              const Text('Actors:', style: AppStyle.titleStyle,),
-                              const SizedBox(height: 10),
-                              ActorsAvatars(cast: credits.cast,),
-                              const SizedBox(height: 50),
 
+                              const SizedBox(height: 10),
+                              credits.cast!.isEmpty ?
+                                  const SizedBox() :
+                              Column(
+                                children: [
+                                  const Text(
+                                    'Actors:',
+                                    style: AppStyle.titleStyle,
+                                  ),
+                                  ActorsAvatars(
+                                    cast: credits.cast,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 50),
                               MoviesListWidget(
                                 movies: state.recommendMovies?.results,
                                 genres: state.genresList,
@@ -160,12 +176,12 @@ class DetailsScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-      
+
                         // const MoviesListWidget()
                       ],
                     );
                   }
-                  if(state is MoviesErrorState){
+                  if (state is MoviesErrorState) {
                     print(state.error);
                     return Center(
                       child: Column(
@@ -173,32 +189,35 @@ class DetailsScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text('Error ${state.error}', style: AppStyle.titleStyle,),
+                          Text(
+                            'Error ${state.error}',
+                            style: AppStyle.titleStyle,
+                          ),
                         ],
                       ),
                     );
-                  }
-                  else {
-                    return const SizedBox(child: Text('data'),);
+                  } else {
+                    return const SizedBox(
+                      child: Text('data'),
+                    );
                   }
                 },
               ),
-      
             ),
             Positioned(
                 top: 30,
                 left: 20,
                 child: InkWell(
                   onTap: () {
-      
-
                     // Navigator.pop(context);
-context.pop();
 
 
                     // context.go('/home');
+                    !inSearch ? context.read<MoviesDbBloc>().add(MoviesLoadEvent()) :
+                    context.read<MoviesDbBloc>().add(MoviesSearchEvent(query: context.read<MoviesProvider>().searchController.text));
 
-                    context.read<MoviesDbBloc>().add(MoviesLoadEvent());
+                    context.read<MoviesProvider>().goFirstPage(context);
+
                   },
                   child: Container(
                     width: 50,
@@ -222,9 +241,7 @@ context.pop();
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: RichText(
-          text: TextSpan(
-              style: const TextStyle(height: 1.3),
-              children: [
+          text: TextSpan(style: const TextStyle(height: 1.3), children: [
         TextSpan(
           text: "$title: ",
           style: AppStyle.normalStyle,

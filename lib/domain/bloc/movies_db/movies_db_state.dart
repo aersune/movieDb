@@ -82,9 +82,14 @@ final class TvSeriesDetailsLoadedState extends MoviesDbState {
         seriesDetails: seriesDetails ?? this.seriesDetails,
         credits: credits ?? this.credits,
       recommendSeries: recommendSeries ?? this.recommendSeries,
-
     );
   }
+}
+final class SearchBarEmptyState extends MoviesDbState {}
+
+final class MoviesSearchState extends MoviesDbState {
+  final SearchResultsModel searchResult;
+  MoviesSearchState({required this.searchResult});
 }
 
 final class MoviesErrorState extends MoviesDbState {

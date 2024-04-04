@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 
@@ -7,6 +9,8 @@ class UserProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final prov = context.watch<MoviesProvider>();
     return Row(
       children: [
         Container(
@@ -16,8 +20,8 @@ class UserProfileWidget extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.whiteColor),
               image: const DecorationImage(
-                  image: NetworkImage(
-                      "https://images.pexels.com/photos/1435612/pexels-photo-1435612.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"),
+                  image: AssetImage(
+                      "assets/profile.png"),
               fit: BoxFit.cover
               )),
         ),
@@ -25,8 +29,8 @@ class UserProfileWidget extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Anna Belkova', style: AppStyle.titleStyle.copyWith(fontWeight: FontWeight.w400),),
-            Text('belkovaa@gmail.com', style: AppStyle.normalStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.grayText),),
+            Text("${prov.userData.username}", style: AppStyle.titleStyle.copyWith(fontWeight: FontWeight.w400),),
+            Text('useremail@gmail.com', style: AppStyle.normalStyle.copyWith(fontWeight: FontWeight.w400, color: AppColors.grayText),),
           ],
         )
       ],

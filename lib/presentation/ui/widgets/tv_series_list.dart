@@ -61,9 +61,9 @@ class TvSeriesList extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: (){
-                        print(state.tvSeries!.results?[index].id);
+                        // print(state.tvSeries!.results?[index].id);
                         context.read<MoviesDbBloc>().add(TvSeriesDetailsEvent(idMovie: state.tvSeries!.results![index].id ?? 0));
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=> const TvSeriesDetailsScreen()));
+                        context.pushNamed('tvDetails');
                       },
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

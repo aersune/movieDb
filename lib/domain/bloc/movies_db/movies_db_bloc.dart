@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:movie_db/domain/models/search_results_model.dart';
 import 'package:movie_db/domain/models/tv_series_details.dart';
 
 import '../../api/api_repository.dart';
@@ -19,6 +20,7 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
 
   MoviesDbBloc(this.apiRepository) : super(MoviesDbInitial()) {
     on<MoviesLoadEvent>((event, emit) async {
+
       try {
         final MoviesModel popularMovies = await apiRepository.getAllPopularMovies();
         final GenresList genresList = await apiRepository.getAllGenres();
@@ -62,6 +64,8 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
       }
     });
 
+
+
     on<MoviesDetailsEvent>((MoviesDetailsEvent event, emit) async {
       try {
         final MovieDetails movieDetails = await apiRepository.getDetails(event.idMovie);
@@ -81,6 +85,17 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
           error: e.toString()
         ));
       }
+    });
+
+    on<MoviesSearchEvent>((event, emit)  async{
+
+      final SearchResultsModel searchResult = await apiRepository.getAllSearchResult(event.query);
+      if(event.query == '') {
+        emit(SearchBarEmptyState());
+      }else{
+        emit(MoviesSearchState(searchResult: searchResult));
+      }
+
     });
   }
 }

@@ -1,20 +1,25 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
-import 'package:movie_db/presentation/router/app_routes.dart';
-import 'package:movie_db/presentation/ui/screens/details_screen.dart';
+import 'package:movie_db/presentation/components/app_style.dart';
+import 'package:movie_db/presentation/components/bottom_navbar_comp.dart';
 import 'package:movie_db/presentation/ui/screens/library_screen.dart';
+import 'package:movie_db/presentation/ui/screens/login_screen.dart';
 import 'package:movie_db/presentation/ui/screens/search_screen.dart';
 import 'package:movie_db/presentation/ui/screens/settings_screen.dart';
 
-import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
+import '../../../domain/api/data_providers/session_data_provider.dart';
+import '../../components/my_app_model.dart';
 import 'home_screen.dart';
 
+
 class MainScreen extends StatelessWidget {
-  const MainScreen({super.key, required this.navigationShell});
+   MainScreen({super.key, required this.navigationShell, required this.isLogged});
+  final bool isLogged;
 
   final StatefulNavigationShell navigationShell;
 
@@ -23,99 +28,80 @@ class MainScreen extends StatelessWidget {
     const SearchScreen(),
     const LibraryScreen(),
     const SettingsScreen(),
+    const LoginScreen(),
   ];
 
   void _goToBranch(int index){
     navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
-
   }
+
 
   @override
   Widget build(BuildContext context) {
+    var sessionId = SessionDataProvider().getSessionId();
+    final provider = context.read<MoviesProvider>();
+    final prov = context.watch<MoviesProvider>();
+
+
+    provider.getAllApi('65ff872a08367d46ad4e28a64a4299327054f8c3');
+
+    provider.isLogged = isLogged;
+
     return Scaffold(
       backgroundColor: AppColors.mainDark,
-      body: navigationShell,
-      bottomNavigationBar: Theme(
+      body: StreamBuilder(
+        stream: Connectivity().onConnectivityChanged,
+        builder: (context,AsyncSnapshot<List<ConnectivityResult>> snapshot) {
+          // print(snapshot.toString());
+          if(snapshot.hasData){
+            List<ConnectivityResult>? result = snapshot.data;
+            if(result!.contains(ConnectivityResult.mobile)){
+                return navigationShell;
+            }else if(result.contains(ConnectivityResult.wifi)){
+              return navigationShell;
+            }else{
+              return noInternet(context);
+            }
+          }else{
+              return loading();
+          }
+          // return ;
+        }
+      ),
+
+      bottomNavigationBar: prov.isLogged ?  Theme(
         data: Theme.of(context).copyWith(
           canvasColor: AppColors.mainDark,
           primaryColor: Colors.blue,
-
         ),
-        child: BottomNavigationBar(
-          showSelectedLabels: false,
-         showUnselectedLabels: false,
-          onTap: (index){
-            context.read<MoviesDbBloc>().add(MoviesLoadEvent());
-           // if(index < 4) {
-             _goToBranch(index);
-           // }
-            context.read<NavigateProvider>().changePage(page: index);
-          },
-            currentIndex: context.watch<NavigateProvider>().pageIndex,
-            backgroundColor: AppColors.appDark,
-            items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled, color: Colors.red,),
-            label: ''
+        child: BottomNavbarComp(navigationShell: navigationShell,)
+      ): const SizedBox.shrink()
+      
+    ) ;
+  }
+  Widget loading(){
+    return const Center(
+      child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.green),),
+    );
+  }
+  Widget noInternet(context){
+    return  Container(
+      color: AppColors.appDark,
+      width: MediaQuery.of(context).size.width,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset("assets/no_connection.png",height: 150,),
+          Container(
+            margin: const EdgeInsets.only(top: 20, bottom: 10),
+            child: const Text("Нет подключение к интернету", style: AppStyle.titleStyle,),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded,color: Colors.red,),
-              label: ''
+          Container(
+            margin: const EdgeInsets.only(bottom: 20),
+            child:  Text("Проверьте подключение к Интернету и обновите страницу.", style: AppStyle.normalStyle.copyWith(color: Colors.white70),),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark_outline,color: Colors.red,),
-              label: ''
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings,color: Colors.red,),
-              label: ''
-          ),
-
-        ]),
+        ],
       ),
-
-      // CupertinoTabScaffold(
-      //
-      //     tabBar: CupertinoTabBar(
-      //         currentIndex: context.watch<NavigateProvider>().pageIndex,
-      //         activeColor: AppColors.lightColor,
-      //         inactiveColor: AppColors.whiteColor,
-      //         backgroundColor: AppColors.appDark,
-      //         onTap: (index){
-      //           context.read<NavigateProvider>().changePage(page: index);
-      //         },
-      //         items: const [
-      //           BottomNavigationBarItem(
-      //             icon: Icon(Icons.home_filled),
-      //           ),
-      //           BottomNavigationBarItem(
-      //             icon: Icon(Icons.dashboard_rounded),
-      //           ),
-      //           BottomNavigationBarItem(
-      //             icon: Icon(Icons.bookmark_outline),
-      //           ),
-      //           BottomNavigationBarItem(
-      //             icon: Icon(Icons.settings),
-      //           ),
-      //
-      //         ]),
-      //
-      //     tabBuilder: (context, index) {
-      //
-      //       return CupertinoTabView(
-      //         routes: {
-      //           '/': (context) => const HomeScreen(),
-      //           '/library_screen': (context) => const LibraryScreen(),
-      //           AppRoutes.details: (context) => const DetailsScreen(),
-      //           AppRoutes.search: (context) => const SearchScreen(),
-      //         },
-      //         builder: (context) {
-      //           return    navigationShell;
-      //
-      //         },
-      //       );
-      //     }
-      //     ),
     );
   }
 }

@@ -1,21 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart%20';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/credits_model.dart';
 import 'package:movie_db/domain/models/tv_series_details.dart';
-
+import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
-import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';
-import 'package:movie_db/presentation/ui/widgets/tv_series_list.dart';
+import 'package:movie_db/presentation/ui/widgets/recommend_tv_widget.dart';
 
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
-import '../../../domain/models/movie_details.dart';
 import '../widgets/actors_images_widget.dart';
 
 class TvSeriesDetailsScreen extends StatelessWidget {
-  const TvSeriesDetailsScreen({super.key});
+  const TvSeriesDetailsScreen({super.key, this.inSearch = false});
+
+  final bool inSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -24,19 +24,18 @@ class TvSeriesDetailsScreen extends StatelessWidget {
       backgroundColor: AppColors.mainDark,
       body: Container(
         color: AppColors.mainDark,
-        child: Stack(
-          children: [
+        child: BlocBuilder<MoviesDbBloc, MoviesDbState>(
+          builder: (context, state) {
+            if (state is TvSeriesDetailsLoadedState) {
+              final TvSeriesDetails? details = state.seriesDetails;
+              final Credits? credits = state.credits;
 
-            SingleChildScrollView(
-              child: BlocBuilder<MoviesDbBloc, MoviesDbState>(
-                builder: (context, state) {
-                  if (state is TvSeriesDetailsLoadedState) {
-                    final TvSeriesDetails? details = state.seriesDetails;
-                    final Credits? credits = state.credits;
-                    print("${details?.id} id");
-                    return Column(
+              print("${details?.id} id");
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: Column(
                       children: [
-
                         Container(
                           width: size.width,
                           height: 570,
@@ -67,9 +66,12 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                                       "${details?.name}",
                                       style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                     ),
-                                    Text("2024 · Season ${details?.lastEpisodeToAir?.seasonNumber} serie ${details?.lastEpisodeToAir?.episodeNumber}", style: AppStyle.normalStyle.copyWith(fontSize: 14)),
+                                    Text(
+                                        "2024 · Season ${details?.lastEpisodeToAir?.seasonNumber} serie ${details?.lastEpisodeToAir?.episodeNumber}",
+                                        style: AppStyle.normalStyle.copyWith(fontSize: 14)),
+                                    details?.productionCountries != null && details!.productionCountries!.isNotEmpty ?
                                     Text("${details?.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
-                                        style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7)),
+                                        style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7)) : const SizedBox(),
                                     const SizedBox(height: 15),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,7 +121,7 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 15),
-                        ratingWidget(details?.voteAverage ?? 0.0, details!.numberOfEpisodes ?? 0, details.numberOfSeasons?? 0),
+                        ratingWidget(details?.voteAverage ?? 0.0, details!.numberOfEpisodes ?? 0, details.numberOfSeasons ?? 0),
                         const SizedBox(height: 15),
                         Padding(
                           padding: const EdgeInsets.symmetric(
@@ -128,6 +130,7 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+
                               Text(
                                 "${details.overview}",
                                 style: AppStyle.normalStyle,
@@ -137,104 +140,104 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                               const SizedBox(height: 10),
                               creditsWidget(
                                   title: 'Directing ',
-                                  body: credits!.crew!.where((el) => el.department == "Directing").map((e) => e.name).join(',  ')),
-                              creditsWidget(
-                                  title: 'Cast ',
-                                  body: credits.cast!.take(15).map((e) => e.name).join(',  ')),
+                                  body: credits!.crew!.where((el) => el.department == "Directing").map((e) => e.name).join(',  '), context: context),
+                              creditsWidget(title: 'Cast ', body: credits.cast!.take(15).map((e) => e.name).join(',  '), context: context),
                               creditsWidget(
                                   title: 'Production ',
-                                  body: credits.crew!.where((el) => el.department == "Production").take(15).map((e) => e.name).join(',  ')),
+                                  body: credits.crew!.where((el) => el.department == "Production").take(15).map((e) => e.name).join(',  '), context: context),
                               creditsWidget(
                                   title: 'Writing ',
-                                  body: credits.crew!.where((el) => el.department == "Writing").map((e) => e.name).join(',  ')),
-
+                                  body: credits.crew!.where((el) => el.department == "Writing").map((e) => e.name).join(',  '), context: context),
                               const SizedBox(height: 10),
-                              const Text('Actors:', style: AppStyle.titleStyle,),
-                              const SizedBox(height: 10),
-                              ActorsAvatars(cast: credits.cast,),
-                              const SizedBox(height: 50),
-
-                              TvSeriesList(
-                                series: state.recommendSeries?.results,
-
-                                title: 'Recommend Movies',
+                              const Text(
+                                'Actors:',
+                                style: AppStyle.titleStyle,
                               ),
+                              const SizedBox(height: 10),
+                              credits.cast!.isNotEmpty ?
+                              ActorsAvatars(
+                                cast: credits.cast,
+                              ) : const SizedBox(),
+                              const SizedBox(height: 50),
+                              state.recommendSeries!.results!.isNotEmpty ?
+                              RecommendTvSeries(
+                                series: state.recommendSeries?.results,
+                                title: 'Recommend Movies',
+                              ) : const SizedBox(),
                             ],
                           ),
                         ),
 
                         // const MoviesListWidget()
                       ],
-                    );
-                  }
-                  if(state is MoviesErrorState){
-                    print(state.error);
-                    return Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text('Error ${state.error}', style: AppStyle.titleStyle,),
-                        ],
-                      ),
-                    );
-                  }
-                  else {
-                    return const SizedBox(child: Text('data'),);
-                  }
-                },
-              ),
-
-            ),
-            Positioned(
-                top: 30,
-                left: 20,
-                child: InkWell(
-                  onTap: () {
-
-
-                    // Navigator.pop(context);
-
-
-                    context.pop('/home');
-
-                    context.read<MoviesDbBloc>().add(MoviesLoadEvent());
-                  },
-                  child: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.appDark),
-                    child: const Center(
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: AppColors.whiteColor,
-                      ),
                     ),
                   ),
-                ))
-          ],
+                  Positioned(
+                      top: 30,
+                      left: 20,
+                      child: InkWell(
+                        onTap: () {
+                          !inSearch ? context.read<MoviesDbBloc>().add(MoviesLoadEvent()) :
+                          context.read<MoviesDbBloc>().add(MoviesSearchEvent(query: context.read<MoviesProvider>().searchController.text));
+                          context.read<MoviesProvider>().goFirstPage(context);
+                        },
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.appDark),
+                          child: const Center(
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: AppColors.whiteColor,
+                            ),
+                          ),
+                        ),
+                      )),
+                ],
+              );
+            }
+            if (state is MoviesErrorState) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Error ${state.error}',
+                      style: AppStyle.titleStyle,
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              return const SizedBox(
+                child: Text('data'),
+              );
+            }
+          },
         ),
       ),
     );
   }
 
-  Widget creditsWidget({required String title, required String body}) {
-    return Padding(
+  Widget creditsWidget({ required BuildContext context ,required String title, required String body}) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
       padding: const EdgeInsets.only(top: 8.0),
       child: RichText(
-          text: TextSpan(
-              style: const TextStyle(height: 1.3),
-              children: [
-                TextSpan(
-                  text: "$title: ",
-                  style: AppStyle.normalStyle,
-                ),
-                TextSpan(
-                  text: body,
-                  style: AppStyle.normalStyle.copyWith(color: AppColors.grayText),
-                ),
-              ])),
+        textAlign: TextAlign.start,
+          text: TextSpan(style: const TextStyle(height: 1.3), children: [
+        TextSpan(
+
+          text: "$title: ",
+          style: AppStyle.normalStyle,
+        ),
+        TextSpan(
+          text: body == '' ? 'no data found' : body,
+          style: AppStyle.normalStyle.copyWith(color: AppColors.grayText),
+        ),
+      ])),
     );
   }
 

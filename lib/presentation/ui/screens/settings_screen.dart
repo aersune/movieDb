@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movie_db/domain/api/data_providers/session_data_provider.dart';
+import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import '../widgets/user_profile_widget.dart';
@@ -39,7 +41,19 @@ class SettingsScreen extends StatelessWidget {
               subTitle: 'Версия 1.6.1',
               context: context),
 
-          ElevatedButton(onPressed: (){context.go('/');}, child: Text('go'))
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.lightColor
+                  ),
+                  onPressed: (){
+                SessionDataProvider().setSessionId(null);
+                context.read<MoviesProvider>().logOut();
+                }, child: const Text('Exit profile', style: TextStyle(color: AppColors.whiteColor),)),
+            ],
+          )
 
         ],
       ),
