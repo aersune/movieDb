@@ -29,8 +29,7 @@ class DetailsScreen extends StatelessWidget {
       throw Exception('Could not launch $url');
     }
   }
-
-
+///awdawd
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
