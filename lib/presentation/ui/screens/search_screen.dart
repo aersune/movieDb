@@ -56,7 +56,7 @@ class SearchScreen extends StatelessWidget {
               ],
             ),
           ),
-           Positioned(
+           const Positioned(
               top: 20,
               child: SearchWidget(),
            )
