@@ -1,5 +1,7 @@
 
 
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:movie_db/domain/models/countries_model.dart';
@@ -12,6 +14,7 @@ import '../models/genres.dart';
 import '../models/movie_details.dart';
 import '../models/popular_movies.dart';
 import '../models/tv_series_model.dart';
+import '../models/youtube_key.dart';
 
 class Api {
   // &page=2
@@ -138,6 +141,19 @@ class Api {
       throw Exception('Error ${response.statusCode}');
     }
   }
+
+
+
+  static Future<YoutubeInfo> getYt(int id) async{
+    final response = await dio.get('https://api.themoviedb.org/3/movie/$id/videos?api_key=${Api.apiKey}');
+    if(response.statusCode == 200) {
+
+      return YoutubeInfo.fromJson(response.data);
+    }else{
+      throw Exception('Error ${response.statusCode}');
+    }
+  }
+
 
 
 

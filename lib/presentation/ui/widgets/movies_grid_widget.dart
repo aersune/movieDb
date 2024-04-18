@@ -23,11 +23,11 @@ class MoviesGridWidget extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: movies?.length ,
       shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
           mainAxisSpacing: 8.0,
           crossAxisSpacing: 8.0,
-          mainAxisExtent: 210
+          mainAxisExtent: MediaQuery.of(context).size.height * .27,
         ),
         itemBuilder: (context, index){
         final mov = movies?[index];

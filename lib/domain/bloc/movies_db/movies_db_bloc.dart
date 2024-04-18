@@ -10,6 +10,7 @@ import '../../models/genres.dart';
 import '../../models/movie_details.dart';
 import '../../models/popular_movies.dart';
 import '../../models/tv_series_model.dart';
+import '../../models/youtube_key.dart';
 
 part 'movies_db_event.dart';
 
@@ -20,25 +21,28 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
 
   MoviesDbBloc(this.apiRepository) : super(MoviesDbInitial()) {
     on<MoviesLoadEvent>((event, emit) async {
-
       try {
         final MoviesModel popularMovies = await apiRepository.getAllPopularMovies();
         final GenresList genresList = await apiRepository.getAllGenres();
         final MoviesModel nowPlaying = await apiRepository.getAllNowPlaying();
         final TvSeries series = await apiRepository.getAllTvSeries();
 
-        if(state is MoviesLoadedState) {
+        if (state is MoviesLoadedState) {
           final currentState = state as MoviesLoadedState;
-          emit(currentState.copyWith(popularMovies: popularMovies, sliderIndex: 0, genresList: genresList, nowPlaying: nowPlaying,
-              tvSeries: series
-          ));
+          emit(currentState.copyWith(
+              popularMovies: popularMovies,
+              sliderIndex: 0,
+              genresList: genresList,
+              nowPlaying: nowPlaying,
+              tvSeries: series));
+        } else {
+          emit(MoviesLoadedState(
+              popularMovies: popularMovies,
+              sliderIndex: 0,
+              genresList: genresList,
+              nowPlaying: nowPlaying,
+              tvSeries: series));
         }
-        else{
-          emit(MoviesLoadedState(popularMovies: popularMovies, sliderIndex: 0, genresList: genresList, nowPlaying: nowPlaying,
-              tvSeries: series
-          ));
-        }
-
       } catch (e) {
         emit(MoviesErrorState(error: e.toString()));
       }
@@ -51,20 +55,15 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
         emit(MoviesLoadedState(sliderIndex: event.sliderIndex));
       }
     });
-    on<TvSeriesDetailsEvent>((event, emit) async{
-      try{
+    on<TvSeriesDetailsEvent>((event, emit) async {
+      try {
         final TvSeriesDetails tvSeriesDetails = await apiRepository.getAllTvSeriesDetails(event.idMovie);
         final Credits credits = await apiRepository.getAllSerialCredits(event.idMovie);
         final TvSeries recommend = await apiRepository.getAllRecommendSeries(event.idMovie);
 
         emit(TvSeriesDetailsLoadedState(seriesDetails: tvSeriesDetails, credits: credits, recommendSeries: recommend));
-
-      } catch(_){
-
-      }
+      } catch (_) {}
     });
-
-
 
     on<MoviesDetailsEvent>((MoviesDetailsEvent event, emit) async {
       try {
@@ -72,30 +71,38 @@ class MoviesDbBloc extends Bloc<MoviesDbEvent, MoviesDbState> {
         final Credits credits = await apiRepository.getAllCredits(event.idMovie);
         final MoviesModel recommend = await apiRepository.getAllRecommend(event.idMovie);
         final GenresList genresList = await apiRepository.getAllGenres();
+        final YoutubeInfo ytInfo = await apiRepository.getYoutubeInfo(event.idMovie);
 
-        if(state is DetailsLoadedState){
+        if (state is DetailsLoadedState) {
           final currentState = state as DetailsLoadedState;
-          emit(currentState.copyWith(movieDetails: movieDetails, credits: credits, recommendMovies: recommend, genresList: genresList,));
-        }else{
-          emit(DetailsLoadedState(movieDetails: movieDetails, credits: credits, recommendMovies: recommend, genresList: genresList, ));
+          emit(currentState.copyWith(
+            movieDetails: movieDetails,
+            credits: credits,
+            recommendMovies: recommend,
+            genresList: genresList,
+            ytInfo: ytInfo
+          ));
+        } else {
+          emit(DetailsLoadedState(
+            movieDetails: movieDetails,
+            credits: credits,
+            recommendMovies: recommend,
+            genresList: genresList,
+            ytInfo: ytInfo
+          ));
         }
-
       } catch (e) {
-        emit(MoviesErrorState(
-          error: e.toString()
-        ));
+        emit(MoviesErrorState(error: e.toString()));
       }
     });
 
-    on<MoviesSearchEvent>((event, emit)  async{
-
+    on<MoviesSearchEvent>((event, emit) async {
       final SearchResultsModel searchResult = await apiRepository.getAllSearchResult(event.query);
-      if(event.query == '') {
+      if (event.query == '') {
         emit(SearchBarEmptyState());
-      }else{
+      } else {
         emit(MoviesSearchState(searchResult: searchResult));
       }
-
     });
   }
 }

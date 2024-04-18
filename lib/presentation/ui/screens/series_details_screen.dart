@@ -67,7 +67,7 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                                       style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                     ),
                                     Text(
-                                        "2024 · Season ${details?.lastEpisodeToAir?.seasonNumber} serie ${details?.lastEpisodeToAir?.episodeNumber}",
+                                        "${details?.firstAirDate?.substring(0, 4)} · Season ${details?.lastEpisodeToAir?.seasonNumber} serie ${details?.lastEpisodeToAir?.episodeNumber}",
                                         style: AppStyle.normalStyle.copyWith(fontSize: 14)),
                                     details?.productionCountries != null && details!.productionCountries!.isNotEmpty ?
                                     Text("${details?.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",

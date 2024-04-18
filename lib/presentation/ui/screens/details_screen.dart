@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/credits_model.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/movie_details.dart';
@@ -17,6 +16,19 @@ class DetailsScreen extends StatelessWidget {
   const DetailsScreen({super.key, this.inSearch = false});
 
   final bool inSearch;
+
+  String convertMinute(minutes) {
+    int hours = minutes ~/ 60;
+    int remainingMinutes = minutes % 60;
+    return '$hours ч $remainingMinutes мин';
+  }
+
+  Future<void> _launchUrl(url) async {
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +45,7 @@ class DetailsScreen extends StatelessWidget {
                   if (state is DetailsLoadedState) {
                     final MovieDetails? details = state.movieDetails;
                     final Credits? credits = state.credits;
+
                     print("${details?.id} id");
                     return Column(
                       children: [
@@ -41,7 +54,8 @@ class DetailsScreen extends StatelessWidget {
                           height: 570,
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                                image: NetworkImage('https://image.tmdb.org/t/p/w500${details?.posterPath}'), fit: BoxFit.cover),
+                                image: NetworkImage('https://image.tmdb.org/t/p/w500${details?.posterPath}'),
+                                fit: BoxFit.cover),
                           ),
                           child: Stack(
                             children: [
@@ -66,16 +80,23 @@ class DetailsScreen extends StatelessWidget {
                                       "${details?.title}",
                                       style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                     ),
-                                    Text("2024 · 1 ч 10 мин", style: AppStyle.normalStyle.copyWith(fontSize: 12)),
-                                    details!.productionCountries!.isNotEmpty ?
-                                    Text("${details.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
-                                        style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7)) : const SizedBox(),
+                                    Text(
+                                        "${details?.releaseDate?.substring(0, 4)} · ${convertMinute(details?.runtime)}",
+                                        style: AppStyle.normalStyle.copyWith(fontSize: 12)),
+                                    details!.productionCountries!.isNotEmpty
+                                        ? Text(
+                                            "${details.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
+                                            style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7))
+                                        : const SizedBox(),
                                     const SizedBox(height: 15),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         InkWell(
-                                          onTap: () {},
+                                          onTap: () {
+                                            _launchUrl(Uri.parse('https://www.youtube.com/watch?v=${state.ytInfo!.results?[0].keyYt}'));
+                                            // await launchUrl();
+                                          } ,
                                           child: Container(
                                             width: size.width * .65,
                                             height: 50,
@@ -135,38 +156,49 @@ class DetailsScreen extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 10),
-                              credits!.crew!.isEmpty ?
-                                  const SizedBox() :
-                              Column(
-                                children: [
-                                  creditsWidget(
-                                      title: 'Directing ',
-                                      body: credits!.crew!.where((el) => el.department == "Directing").map((e) => e.name).join(',  ')),
-                                  creditsWidget(title: 'Cast ', body: credits.cast!.take(15).map((e) => e.name).join(',  ')),
-                                  creditsWidget(
-                                      title: 'Production ',
-                                      body: credits.crew!.where((el) => el.department == "Production").take(15).map((e) => e.name).join(',  ')),
-                                  creditsWidget(
-                                      title: 'Writing ',
-                                      body: credits.crew!.where((el) => el.department == "Writing").map((e) => e.name).join(',  ')),
-                                ],
-                              ),
+                              credits!.crew!.isEmpty
+                                  ? const SizedBox()
+                                  : Column(
+                                      children: [
+                                        creditsWidget(
+                                            title: 'Directing ',
+                                            body: credits!.crew!
+                                                .where((el) => el.department == "Directing")
+                                                .map((e) => e.name)
+                                                .join(',  ')),
+                                        creditsWidget(
+                                            title: 'Cast ',
+                                            body: credits.cast!.take(15).map((e) => e.name).join(',  ')),
+                                        creditsWidget(
+                                            title: 'Production ',
+                                            body: credits.crew!
+                                                .where((el) => el.department == "Production")
+                                                .take(15)
+                                                .map((e) => e.name)
+                                                .join(',  ')),
+                                        creditsWidget(
+                                            title: 'Writing ',
+                                            body: credits.crew!
+                                                .where((el) => el.department == "Writing")
+                                                .map((e) => e.name)
+                                                .join(',  ')),
+                                      ],
+                                    ),
                               const SizedBox(height: 10),
-
                               const SizedBox(height: 10),
-                              credits.cast!.isEmpty ?
-                                  const SizedBox() :
-                              Column(
-                                children: [
-                                  const Text(
-                                    'Actors:',
-                                    style: AppStyle.titleStyle,
-                                  ),
-                                  ActorsAvatars(
-                                    cast: credits.cast,
-                                  ),
-                                ],
-                              ),
+                              credits.cast!.isEmpty
+                                  ? const SizedBox()
+                                  : Column(
+                                      children: [
+                                        const Text(
+                                          'Actors:',
+                                          style: AppStyle.titleStyle,
+                                        ),
+                                        ActorsAvatars(
+                                          cast: credits.cast,
+                                        ),
+                                      ],
+                                    ),
                               const SizedBox(height: 50),
                               MoviesListWidget(
                                 movies: state.recommendMovies?.results,
@@ -211,13 +243,14 @@ class DetailsScreen extends StatelessWidget {
                   onTap: () {
                     // Navigator.pop(context);
 
-
                     // context.go('/home');
-                    !inSearch ? context.read<MoviesDbBloc>().add(MoviesLoadEvent()) :
-                    context.read<MoviesDbBloc>().add(MoviesSearchEvent(query: context.read<MoviesProvider>().searchController.text));
+                    !inSearch
+                        ? context.read<MoviesDbBloc>().add(MoviesLoadEvent())
+                        : context
+                            .read<MoviesDbBloc>()
+                            .add(MoviesSearchEvent(query: context.read<MoviesProvider>().searchController.text));
 
                     context.read<MoviesProvider>().goFirstPage(context);
-
                   },
                   child: Container(
                     width: 50,
@@ -255,38 +288,41 @@ class DetailsScreen extends StatelessWidget {
   }
 
   Widget ratingWidget(double votes) {
-    return Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-      Column(
+    return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            votes.toStringAsFixed(1),
-            style: AppStyle.titleStyle.copyWith(fontSize: 18),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                votes.toStringAsFixed(1),
+                style: AppStyle.titleStyle.copyWith(fontSize: 18),
+              ),
+              Text(
+                'IMDB',
+                style: AppStyle.titleStyle.copyWith(fontSize: 13),
+              ),
+            ],
           ),
-          Text(
-            'IMDB',
-            style: AppStyle.titleStyle.copyWith(fontSize: 13),
+          Container(
+            width: 1,
+            height: 20,
+            color: AppColors.grayText,
           ),
-        ],
-      ),
-      Container(
-        width: 1,
-        height: 20,
-        color: AppColors.grayText,
-      ),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'No data',
-            style: AppStyle.titleStyle.copyWith(fontSize: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'No data',
+                style: AppStyle.titleStyle.copyWith(fontSize: 12),
+              ),
+              Text(
+                'Кинопоиск',
+                style: AppStyle.titleStyle.copyWith(fontSize: 13),
+              ),
+            ],
           ),
-          Text(
-            'Кинопоиск',
-            style: AppStyle.titleStyle.copyWith(fontSize: 13),
-          ),
-        ],
-      ),
-    ]);
+        ]);
   }
 }

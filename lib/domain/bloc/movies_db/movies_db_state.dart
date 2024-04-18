@@ -44,9 +44,10 @@ final class DetailsLoadedState extends MoviesDbState {
   final Credits? credits;
   final MoviesModel? recommendMovies;
   late GenresList? genresList;
+  final YoutubeInfo? ytInfo;
   final int? navBarIndex;
 
-  DetailsLoadedState({ this.movieDetails,  this.credits,  this.recommendMovies, this.genresList,  this.navBarIndex});
+  DetailsLoadedState({ this.movieDetails,  this.credits,  this.recommendMovies, this.genresList,  this.navBarIndex, this.ytInfo});
 
   DetailsLoadedState copyWith({
     MovieDetails? movieDetails,
@@ -54,13 +55,15 @@ final class DetailsLoadedState extends MoviesDbState {
     MoviesModel? recommendMovies,
     GenresList? genresList,
     int? navBarIndex,
+    YoutubeInfo? ytInfo,
   }) {
     return DetailsLoadedState(
       movieDetails: movieDetails ?? this.movieDetails,
       credits: credits ?? this.credits,
       recommendMovies: recommendMovies ?? this.recommendMovies,
       genresList: genresList ?? this.genresList,
-      navBarIndex: navBarIndex ?? this.navBarIndex
+      navBarIndex: navBarIndex ?? this.navBarIndex,
+      ytInfo: ytInfo ?? this.ytInfo,
     );
   }
 }

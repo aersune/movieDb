@@ -10,6 +10,7 @@ import '../models/movie_details.dart';
 import '../models/popular_movies.dart';
 import '../models/tv_series_model.dart';
 import '../models/user_data_model.dart';
+import '../models/youtube_key.dart';
 
 class ApiRepository {
   Future<MoviesModel> getAllPopularMovies() => Api.getPopularMovies();
@@ -26,6 +27,7 @@ class ApiRepository {
   Future<SearchResultsModel> getAllSearchResult(String query) => Api.getSearchResult(query);
   Future<List<Countries>> getAllCountries() => Api.getCountries();
   Future<UserData> getUserData(String sessionId) => Api.getProfileInfo(sessionId);
+  Future<YoutubeInfo> getYoutubeInfo(int  id) => Api.getYt(id);
 
 
 }
