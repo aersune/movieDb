@@ -24,7 +24,7 @@ class AppNavigation {
 
 
   static String initR = '';
-   // initialRoute(bool isAuth) => isAuth ? initR = '/home' : '/login';
+   initialRoute(bool isAuth) => isAuth ? initR = '/home' : '/login';
 
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _rootNavigatorHome = GlobalKey<NavigatorState>(debugLabel: 'shellHome');

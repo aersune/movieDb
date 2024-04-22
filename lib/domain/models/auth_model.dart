@@ -17,16 +17,19 @@ class AuthModel extends ChangeNotifier {
   TextEditingController loginController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+
+
   bool _isAuthProgress = false;
   bool get canStartAuth => _isAuthProgress;
   bool get isAuthProgress => _isAuthProgress;
-
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
   Future<void> auth(BuildContext context) async{
     final login = loginController.text;
     final password = passwordController.text;
+    final model = context.read<MoviesProvider>();
+
     if(login.isEmpty || password.isEmpty) {
       _errorMessage = 'Заполните логин и пароль';
       notifyListeners();
@@ -53,8 +56,8 @@ class AuthModel extends ChangeNotifier {
     await _sessionDataProvider.setSessionId(sessionId);
     // _isAuthProgress = false;
     // Provider.of(context,listen: false);
-    unawaited(context.read<MoviesProvider>().logged());
 
+    model.logged();
     context.go('/home');
   }
 

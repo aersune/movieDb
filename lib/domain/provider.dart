@@ -1,6 +1,3 @@
-
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/api/api_repository.dart';
@@ -10,12 +7,17 @@ import 'package:movie_db/domain/models/user_data_model.dart';
 
 
 class MoviesProvider extends ChangeNotifier {
+
+
+
+
     int pageIndex = 0;
 
-    bool isLogged = false;
+    var isLogged = false;
 
     logged(){
       isLogged = true;
+
       notifyListeners();
     }
     logOut(){
@@ -43,9 +45,12 @@ class MoviesProvider extends ChangeNotifier {
     movieGenres = await ApiRepository().getAllGenres();
     tvGenres = await ApiRepository().getAllGenresTv();
     countries = await ApiRepository().getAllCountries();
-    userData = await ApiRepository().getUserData(sessionId);
+    sessionId != null ? userData = await ApiRepository().getUserData(sessionId) : null;
+    logged();
     notifyListeners();
   }
+
+
 
 
 

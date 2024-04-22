@@ -1,13 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movie_db/domain/api/api_repository.dart';
-
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import 'package:movie_db/presentation/ui/widgets/tv_series_list.dart';
-
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../widgets/movies_list_widget.dart';
 import '../widgets/slider_widget.dart';

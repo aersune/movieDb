@@ -11,7 +11,6 @@ import 'package:movie_db/presentation/router/app_navigation.dart';
 
 import 'package:provider/provider.dart';
 
-import 'domain/models/auth_model.dart';
 
 
 

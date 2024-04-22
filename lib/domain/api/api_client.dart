@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:movie_db/domain/provider.dart';
 
 class ApiClient {
   final _client = HttpClient();
@@ -9,7 +10,7 @@ class ApiClient {
   static final _apiKey = dotenv.get('API_KEY');
 
 
-  Future<String> auth({required String username, required String password}) async{
+  Future<String> auth({required String username, required String password, context}) async{
     final token = await _makeToken();
     final validToken = await _validateUser(username: username, password: password, requestToken: token);
     final sessionId = await _makeSession(requestToken: validToken);

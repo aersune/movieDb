@@ -36,7 +36,8 @@ class DetailsScreen extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async{
         context.read<MoviesDbBloc>().add(MoviesLoadEvent());
-        context.go('/home');
+        // context.go('/home');
+        context.read<MoviesProvider>().goFirstPage(context);
         return false;
       },
       child: Scaffold(

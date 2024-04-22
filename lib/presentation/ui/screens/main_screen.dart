@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
@@ -13,12 +13,11 @@ import 'package:movie_db/presentation/ui/screens/search_screen.dart';
 import 'package:movie_db/presentation/ui/screens/settings_screen.dart';
 
 import '../../../domain/api/data_providers/session_data_provider.dart';
-import '../../components/my_app_model.dart';
 import 'home_screen.dart';
 
 
 class MainScreen extends StatelessWidget {
-   MainScreen({super.key, required this.navigationShell, required this.isLogged});
+   const MainScreen({super.key, required this.navigationShell, required this.isLogged});
   final bool isLogged;
 
   final StatefulNavigationShell navigationShell;
@@ -38,46 +37,88 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var sessionId = SessionDataProvider().getSessionId();
+    // final sessionId = SessionDataProvider().read();
     final provider = context.read<MoviesProvider>();
-    final prov = context.watch<MoviesProvider>();
+    // final prov = context.watch<MoviesProvider>();
 
 
-    provider.getAllApi('65ff872a08367d46ad4e28a64a4299327054f8c3');
 
-    provider.isLogged = isLogged;
 
-    return Scaffold(
-      backgroundColor: AppColors.mainDark,
-      body: StreamBuilder(
-        stream: Connectivity().onConnectivityChanged,
-        builder: (context,AsyncSnapshot<List<ConnectivityResult>> snapshot) {
-          // print(snapshot.toString());
-          if(snapshot.hasData){
-            List<ConnectivityResult>? result = snapshot.data;
-            if(result!.contains(ConnectivityResult.mobile)){
-                return navigationShell;
-            }else if(result.contains(ConnectivityResult.wifi)){
-              return navigationShell;
-            }else{
-              return noInternet(context);
-            }
-          }else{
-              return loading();
+
+    // provider.getAllApi(sessionId);
+
+    // provider.isLogged = isLogged;
+    // print(sessionId);
+
+    return FutureBuilder(
+      future: SessionDataProvider().read(),
+      builder: (context,  AsyncSnapshot<String?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+
+            provider.getAllApi(snapshot.data);
+
+
+            return MainBody(navigationShell : navigationShell);
+
+            // return Text('Session ID: ${snapshot.data}');
           }
-          // return ;
         }
-      ),
+        provider.getAllApi(snapshot.data);
+        return MainBody(navigationShell : navigationShell,);
 
-      bottomNavigationBar: prov.isLogged ?  Theme(
-        data: Theme.of(context).copyWith(
-          canvasColor: AppColors.mainDark,
-          primaryColor: Colors.blue,
-        ),
-        child: BottomNavbarComp(navigationShell: navigationShell,)
-      ): const SizedBox.shrink()
-      
+      }
     ) ;
+  }
+
+}
+
+
+class MainBody extends StatelessWidget {
+  const MainBody({super.key, required this.navigationShell});
+
+
+  final StatefulNavigationShell navigationShell;
+
+
+  @override
+  Widget build(BuildContext context) {
+   
+     
+     
+    return Scaffold(
+        backgroundColor: AppColors.mainDark,
+        body: StreamBuilder(
+            stream: Connectivity().onConnectivityChanged,
+            builder: (context,AsyncSnapshot<List<ConnectivityResult>> snapshot) {
+              // print(snapshot.toString());
+              if(snapshot.hasData){
+                List<ConnectivityResult>? result = snapshot.data;
+                if(result!.contains(ConnectivityResult.mobile)){
+                  return navigationShell;
+                }else if(result.contains(ConnectivityResult.wifi)){
+                  return navigationShell;
+                }else{
+                  return noInternet(context);
+                }
+              }else{
+                return loading();
+              }
+              // return ;
+            }
+        ),
+
+        bottomNavigationBar: Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: AppColors.mainDark,
+              primaryColor: Colors.blue,
+            ),
+            child: BottomNavbarComp(navigationShell: navigationShell,)
+        )
+
+    );
   }
   Widget loading(){
     return const Center(
@@ -105,3 +146,4 @@ class MainScreen extends StatelessWidget {
     );
   }
 }
+

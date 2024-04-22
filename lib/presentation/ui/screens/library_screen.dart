@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
-import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});

@@ -17,7 +17,8 @@ class BottomNavbarComp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  BottomAppBar(
+    final model = context.watch<MoviesProvider>();
+    return  model.isLogged ?  BottomAppBar(
       height: 55,
       color: AppColors.mainDark,
       padding: EdgeInsets.zero,
@@ -30,7 +31,7 @@ class BottomNavbarComp extends StatelessWidget {
           NavbarButton( index: 3,icon: Icons.settings, navigationShell: navigationShell),
         ],
       ),
-    );
+    ) : const SizedBox.shrink();
   }
 
 }

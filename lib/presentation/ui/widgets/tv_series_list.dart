@@ -96,7 +96,8 @@ class TvSeriesList extends StatelessWidget {
                           Text(
                               // "${genres?.genres?.where((g) => g.id == series![0].genreIds?[0]).toSet().first.id} ·"
                             // "${series?[0].genreIds?.join('')}"
-                                  " ${series?[index].firstAirDate?.substring(0, 4)}"
+                              series![index].firstAirDate!.isNotEmpty && series?[index].firstAirDate != null ?
+                                  " ${series?[index].firstAirDate?.substring(0, 4)}" : 'no data'
                               ,
                               style: AppStyle.normalStyle),
                         ],
