@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/popular_movies.dart';
-import 'package:movie_db/presentation/router/app_routes.dart';
 
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/genres.dart';

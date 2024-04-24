@@ -5,7 +5,6 @@ import 'package:movie_db/domain/models/tv_series_details.dart';
 
 import '../../api/api_repository.dart';
 import '../../models/credits_model.dart';
-import '../../models/details_model.dart';
 import '../../models/genres.dart';
 import '../../models/movie_details.dart';
 import '../../models/popular_movies.dart';

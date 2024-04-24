@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/credits_model.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
 import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/movie_details.dart';
-
 import '../widgets/actors_images_widget.dart';
 
 class DetailsScreen extends StatelessWidget {
@@ -92,7 +89,7 @@ class DetailsScreen extends StatelessWidget {
                                           style: AppStyle.normalStyle.copyWith(fontSize: 12)),
                                       details!.productionCountries!.isNotEmpty
                                           ? Text(
-                                              "${details.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
+                                              "${details.productionCountries?[0].name} · ${details.genres?.map((e) => e.name).join(', ')}",
                                               style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7))
                                           : const SizedBox(),
                                       const SizedBox(height: 15),
@@ -221,7 +218,7 @@ class DetailsScreen extends StatelessWidget {
                       );
                     }
                     if (state is MoviesErrorState) {
-                      print(state.error);
+
                       return Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.max,

@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/models/tv_series_model.dart';
-import 'package:movie_db/presentation/ui/screens/series_details_screen.dart';
-
 import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
-import '../../../domain/models/genres.dart';
 import '../../components/app_colors.dart';
 import '../../components/app_style.dart';
 

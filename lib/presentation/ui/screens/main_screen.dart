@@ -1,7 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
@@ -11,6 +10,7 @@ import 'package:movie_db/presentation/ui/screens/library_screen.dart';
 import 'package:movie_db/presentation/ui/screens/login_screen.dart';
 import 'package:movie_db/presentation/ui/screens/search_screen.dart';
 import 'package:movie_db/presentation/ui/screens/settings_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../../domain/api/data_providers/session_data_provider.dart';
 import 'home_screen.dart';
@@ -30,43 +30,34 @@ class MainScreen extends StatelessWidget {
     const LoginScreen(),
   ];
 
-  void _goToBranch(int index){
-    navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
-  }
+  // void _goToBranch(int index){
+  //   navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
+  // }
 
 
   @override
   Widget build(BuildContext context) {
     // final sessionId = SessionDataProvider().read();
     final provider = context.read<MoviesProvider>();
-    // final prov = context.watch<MoviesProvider>();
 
-
-
-
-
-    // provider.getAllApi(sessionId);
-
-    // provider.isLogged = isLogged;
-    // print(sessionId);
 
     return FutureBuilder(
       future: SessionDataProvider().read(),
       builder: (context,  AsyncSnapshot<String?> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
+
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.hasData) {
-
             provider.getAllApi(snapshot.data);
-
-
             return MainBody(navigationShell : navigationShell);
 
             // return Text('Session ID: ${snapshot.data}');
           }
+
         }
-        provider.getAllApi(snapshot.data);
+
+        provider.getAllApi(null);
         return MainBody(navigationShell : navigationShell,);
 
       }

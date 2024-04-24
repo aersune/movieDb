@@ -5,10 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/bloc/movies_db/movies_db_bloc.dart';
 import 'package:movie_db/domain/models/popular_movies.dart';
-import 'package:movie_db/presentation/router/app_routes.dart';
 import '../../components/app_colors.dart';
 import '../../components/app_style.dart';
-import '../screens/details_screen.dart';
 import 'build_indicator.dart';
 
 class SliderWidget extends StatelessWidget {

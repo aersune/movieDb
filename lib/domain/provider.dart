@@ -16,11 +16,13 @@ class MoviesProvider extends ChangeNotifier {
     var isLogged = false;
 
     logged(){
+      print('logged');
       isLogged = true;
 
       notifyListeners();
     }
     logOut(){
+      print('logOut');
       isLogged = false;
       notifyListeners();
     }
@@ -46,7 +48,7 @@ class MoviesProvider extends ChangeNotifier {
     tvGenres = await ApiRepository().getAllGenresTv();
     countries = await ApiRepository().getAllCountries();
     sessionId != null ? userData = await ApiRepository().getUserData(sessionId) : null;
-    logged();
+    // logged();
     notifyListeners();
   }
 

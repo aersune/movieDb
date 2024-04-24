@@ -45,6 +45,7 @@ class ActorsAvatars extends StatelessWidget {
           );
         }
           const SizedBox();
+          return null;
       }),
     );
   }

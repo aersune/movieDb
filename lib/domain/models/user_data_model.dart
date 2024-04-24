@@ -87,7 +87,7 @@ class Gravatar {
 }
 
 class Tmdb {
-  Null? avatarPath;
+  dynamic avatarPath;
 
   Tmdb({this.avatarPath});
 

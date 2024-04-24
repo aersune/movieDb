@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,7 +5,6 @@ import 'package:movie_db/domain/bloc/movies_db/movies_db_bloc.dart';
 import 'package:movie_db/domain/models/search_results_model.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
-import 'package:movie_db/presentation/components/app_style.dart';
 import 'package:movie_db/presentation/ui/widgets/not_found_widgte.dart';
 
 

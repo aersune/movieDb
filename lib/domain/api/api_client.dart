@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:movie_db/domain/provider.dart';
 
 class ApiClient {
   final _client = HttpClient();

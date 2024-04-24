@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_db/presentation/components/app_colors.dart';
 import 'package:movie_db/presentation/components/app_style.dart';
-
-
 
 class NotFoundWidget extends StatelessWidget {
   const NotFoundWidget({super.key, required this.query});
