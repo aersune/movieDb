@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart%20';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,13 +14,21 @@ import '../widgets/actors_images_widget.dart';
 
 
 
-class TvSeriesDetailsScreen extends StatelessWidget {
+class TvSeriesDetailsScreen extends StatefulWidget {
   const TvSeriesDetailsScreen({super.key, this.inSearch = false});
 
   final bool inSearch;
 
   @override
+  State<TvSeriesDetailsScreen> createState() => _TvSeriesDetailsScreenState();
+}
+
+class _TvSeriesDetailsScreenState extends State<TvSeriesDetailsScreen> {
+  late Future<bool> _isFavorite;
+
+  @override
   Widget build(BuildContext context) {
+    final provider = context.read<MoviesProvider>();
     final size = MediaQuery.of(context).size;
     return WillPopScope(
       onWillPop: () async {
@@ -33,11 +43,28 @@ class TvSeriesDetailsScreen extends StatelessWidget {
           color: AppColors.mainDark,
           child: BlocBuilder<MoviesDbBloc, MoviesDbState>(
             builder: (context, state) {
+
+
               if (state is TvSeriesDetailsLoadedState) {
                 final TvSeriesDetails? details = state.seriesDetails;
                 final Credits? credits = state.credits;
 
-                print("${details?.id} id");
+                void toggleFavorite(bool isFav) async {
+
+                  provider.setFav(mediaId: details!.id!.toInt(), mediaType: 'tv', isFav: !isFav);
+                  setState(() {
+                    _isFavorite = provider.isFavorite(mediaId:  details.id!.toInt(), mediaType: 'tv');
+                  });
+                }
+
+                _isFavorite = context.read<MoviesProvider>().isFavorite(
+                  mediaId: details!.id!.toInt(),
+                  mediaType: 'tv',
+                );
+
+                if (kDebugMode) {
+                  print("${details.id} id");
+                }
                 return Stack(
                   children: [
                     SingleChildScrollView(
@@ -48,7 +75,7 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                             height: 570,
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                  image: NetworkImage('https://image.tmdb.org/t/p/w500${details?.posterPath}'),
+                                  image: NetworkImage('https://image.tmdb.org/t/p/w500${details.posterPath}'),
                                   fit: BoxFit.cover),
                             ),
                             child: Stack(
@@ -71,15 +98,15 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "${details?.name}",
+                                        "${details.name}",
                                         style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                       ),
                                       Text(
-                                          "${details?.firstAirDate?.substring(0, 4)} · Season ${details?.lastEpisodeToAir?.seasonNumber} serie ${details?.lastEpisodeToAir?.episodeNumber}",
+                                          "${details.firstAirDate?.substring(0, 4)} · Season ${details.lastEpisodeToAir?.seasonNumber} serie ${details.lastEpisodeToAir?.episodeNumber}",
                                           style: AppStyle.normalStyle.copyWith(fontSize: 14)),
-                                      details?.productionCountries != null && details!.productionCountries!.isNotEmpty
+                                      details.productionCountries != null && details.productionCountries!.isNotEmpty
                                           ? Text(
-                                              "${details?.productionCountries?[0].name} · ${details?.genres?.map((e) => e.name).join(', ')}",
+                                              "${details.productionCountries?[0].name} · ${details.genres?.map((e) => e.name).join(', ')}",
                                               style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7))
                                           : const SizedBox(),
                                       const SizedBox(height: 15),
@@ -112,11 +139,38 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                                               ),
                                             ),
                                           ),
-                                          const Icon(
-                                            Icons.favorite_border,
-                                            size: 30,
-                                            color: AppColors.whiteColor,
-                                          ),
+                                          FutureBuilder<bool>(
+                                              future: _isFavorite,
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                  return const Center(
+                                                    child: CupertinoActivityIndicator(color: AppColors.lightColor,),
+                                                  );
+                                                } else if (snapshot.hasError) {
+                                                  {
+                                                    if (kDebugMode) {
+                                                      print('Error: ${snapshot.error}');
+                                                    }
+                                                    return const Text(
+                                                      'Error:',
+                                                      style: TextStyle(color: Colors.white),
+                                                    );
+                                                  }
+                                                } else {
+                                                  final isFavorite = snapshot.data!;
+
+
+                                                  return IconButton(
+                                                      onPressed: () {
+                                                        toggleFavorite(isFavorite);
+                                                      },
+                                                      icon: Icon(
+                                                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                                                        size: 30,
+                                                        color: isFavorite ? AppColors.lightColor : AppColors.whiteColor,
+                                                      ));
+                                                }
+                                              }),
                                           const Icon(
                                             Icons.more_vert,
                                             size: 30,
@@ -131,7 +185,7 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 15),
-                          ratingWidget(details?.voteAverage ?? 0.0, details!.numberOfEpisodes ?? 0,
+                          ratingWidget(details.voteAverage ?? 0.0, details.numberOfEpisodes ?? 0,
                               details.numberOfSeasons ?? 0),
                           const SizedBox(height: 15),
                           Padding(
@@ -205,7 +259,7 @@ class TvSeriesDetailsScreen extends StatelessWidget {
                         left: 20,
                         child: InkWell(
                           onTap: () {
-                            !inSearch
+                            !widget.inSearch
                                 ? context.read<MoviesDbBloc>().add(MoviesLoadEvent())
                                 : context.read<MoviesDbBloc>().add(
                                     MoviesSearchEvent(query: context.read<MoviesProvider>().searchController.text));

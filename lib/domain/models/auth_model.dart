@@ -1,16 +1,14 @@
-
-
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:movie_db/domain/api/api_client.dart';
+import 'package:movie_db/domain/api/api_auth.dart';
 import 'package:movie_db/domain/api/data_providers/session_data_provider.dart';
 import 'package:movie_db/domain/provider.dart';
 import 'package:provider/provider.dart';
 
 class AuthModel extends ChangeNotifier {
-  final _apiClient = ApiClient();
+  final _apiClient = ApiAuth();
   final _sessionDataProvider =  SessionDataProvider();
 
   TextEditingController loginController = TextEditingController();
@@ -25,8 +23,8 @@ class AuthModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> auth(BuildContext context) async{
-    final login = loginController.text;
-    final password = passwordController.text;
+    final login = loginController.text.trim();
+    final password = passwordController.text.trim();
     final model = context.read<MoviesProvider>();
 
     if(login.isEmpty || password.isEmpty) {
@@ -39,7 +37,8 @@ class AuthModel extends ChangeNotifier {
     notifyListeners();
     String? sessionId;
     try{
-       sessionId = await  _apiClient.auth(username: login, password: password);
+       sessionId = await  _apiClient.auth(username: login, password: password,);
+
     } catch(e){
         _errorMessage = 'Неправильный логин или пароль';
     }

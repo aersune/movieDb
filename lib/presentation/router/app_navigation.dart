@@ -7,7 +7,7 @@ import 'package:movie_db/presentation/ui/screens/home_screen.dart';
 import 'package:movie_db/presentation/ui/screens/library_screen.dart';
 import 'package:movie_db/presentation/ui/screens/main_screen.dart';
 import 'package:movie_db/presentation/ui/screens/search_screen.dart';
-import 'package:movie_db/presentation/ui/screens/series_details_screen.dart';
+import 'package:movie_db/presentation/ui/screens/tv_details_screen.dart';
 import 'package:movie_db/presentation/ui/screens/settings_screen.dart';
 import 'package:movie_db/presentation/ui/widgets/movies_grid_widget.dart';
 import 'package:movie_db/presentation/ui/widgets/movies_list_widget.dart';

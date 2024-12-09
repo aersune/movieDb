@@ -1,5 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
+
 import 'package:flutter/material.dart%20';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -23,11 +24,18 @@ class SliderWidget extends StatelessWidget {
         Stack(
           children: [
             CarouselSlider.builder(
+
               itemCount: 5,
               itemBuilder: (context, index, realIndx) {
                 return Center(
-                    child: Image.network("https://image.tmdb.org/t/p/w500${result[index].posterPath}",
-                        fit: BoxFit.cover, width: 1000));
+                    child: CachedNetworkImage(
+                        imageUrl:
+                        "https://image.tmdb.org/t/p/w500${result[index].posterPath}",
+                        errorWidget: (context, url, error) => const Icon(Icons.error),
+                        placeholder: (context, url) => const Center(child: CircularProgressIndicator(),),
+                        imageBuilder: (context, imageProvider) => Image(
+                            image: imageProvider,fit: BoxFit.cover,),
+                      width: 1000));
               },
               options: CarouselOptions(
                 onPageChanged: (index, reason) {

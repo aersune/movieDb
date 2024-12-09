@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:movie_db/domain/bloc/movies_db/movies_db_bloc.dart';
 import 'package:movie_db/domain/provider.dart';
-
 import 'app_colors.dart';
 
 
@@ -18,7 +17,7 @@ class BottomNavbarComp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<MoviesProvider>();
-    return  model.isLogged ?  BottomAppBar(
+    return  model.isAuth ?  BottomAppBar(
       height: 55,
       color: AppColors.mainDark,
       padding: EdgeInsets.zero,
@@ -55,7 +54,6 @@ class NavbarButton extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      // shape: const CircleBorder(),
       child: InkWell(
 
         borderRadius: BorderRadius.circular(25),

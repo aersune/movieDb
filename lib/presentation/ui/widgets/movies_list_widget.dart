@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -22,11 +23,8 @@ class MoviesListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return
-      movies!.isEmpty ?
-          const SizedBox() :
-
-      Column(
+    return (movies != null && movies!.isNotEmpty)
+        ? Column(
       children: [
         InkWell(
           onTap: () {},
@@ -58,14 +56,17 @@ class MoviesListWidget extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   shrinkWrap: true,
                   itemCount: movies?.length ?? 0,
-                  separatorBuilder: (context, i) => const SizedBox(
-                        width: 15,
-                      ),
+                  separatorBuilder: (context, i) =>
+                  const SizedBox(
+                    width: 15,
+                  ),
                   itemBuilder: (context, index) {
                     return InkWell(
-                      onTap: (){
-                        context.read<MoviesDbBloc>().add(MoviesDetailsEvent(idMovie: movies?[index].id ?? 0, ));
-                        context.read<MoviesProvider>().firstDetailsId = movies![index].id!;
+                      onTap: () {
+                        context.read<MoviesDbBloc>().add(MoviesDetailsEvent(idMovie: movies?[index].id ?? 0,));
+                        context
+                            .read<MoviesProvider>()
+                            .firstDetailsId = movies![index].id!;
                         context.pushNamed('movlistDetails');
                       },
                       child: Column(
@@ -77,8 +78,9 @@ class MoviesListWidget extends StatelessWidget {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 image: DecorationImage(
-                                  image: NetworkImage(
-                                    "https://image.tmdb.org/t/p/w500${movies?[index].posterPath}",
+                                  image: CachedNetworkImageProvider(
+                                    movies![index].posterPath.isNotEmpty && movies?[index].posterPath != null ?
+                                    "https://image.tmdb.org/t/p/w500${movies?[index].posterPath}" : "http://via.placeholder.com/350x150",
                                   ),
                                   fit: BoxFit.cover,
                                 )),
@@ -96,8 +98,12 @@ class MoviesListWidget extends StatelessWidget {
                             ),
                           ),
                           Text(
-                              "${genres?.genres?.where((g) => g.id == movies![0].genreIds?[0]).first.name} · ${movies?[index].releaseDate?.substring(0, 4)}",
-                              style: AppStyle.normalStyle,
+                            "${genres?.genres
+                                ?.where((g) => g.id == movies![0].genreIds?[0])
+                                .first
+                                .name} · ${movies?[index].releaseDate != null && movies![index].releaseDate!.isNotEmpty ? movies![index].releaseDate?.substring(
+                                0, 4) : ''}",
+                            style: AppStyle.normalStyle,
                           ),
                         ],
                       ),
@@ -111,6 +117,7 @@ class MoviesListWidget extends StatelessWidget {
           ),
         )
       ],
-    );
+    )
+        : const SizedBox();
   }
 }

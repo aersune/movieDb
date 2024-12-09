@@ -12,7 +12,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Container(
       color: AppColors.mainDark,
       child: SingleChildScrollView(
@@ -27,7 +26,7 @@ class HomeScreen extends StatelessWidget {
               );
             }
             if (state is MoviesLoadedState) {
-              final movies = state.popularMovies!.results;
+              // final movies = state.popularMovies!.results;
               return Column(
                 children: [
                   SliderWidget(result: state.popularMovies!.results!.sublist(0, 8)),
@@ -43,8 +42,7 @@ class HomeScreen extends StatelessWidget {
                     title: 'Сейчас смотрят',
                   ),
                   TvSeriesList(series: state.tvSeries?.results, title: 'Serials',)
-                  // MoviesListWidget(),
-                  // MoviesListWidget(),
+
                 ],
               );
             }

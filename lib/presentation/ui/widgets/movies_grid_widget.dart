@@ -26,7 +26,7 @@ class MoviesGridWidget extends StatelessWidget {
           crossAxisCount: 4,
           mainAxisSpacing: 8.0,
           crossAxisSpacing: 8.0,
-          mainAxisExtent: MediaQuery.of(context).size.height * .27,
+          mainAxisExtent: MediaQuery.of(context).size.height * .3,
         ),
         itemBuilder: (context, index){
         final mov = movies?[index];

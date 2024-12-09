@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:movie_db/domain/models/search_results_model.dart';
 import 'package:movie_db/domain/models/tv_series_details.dart';

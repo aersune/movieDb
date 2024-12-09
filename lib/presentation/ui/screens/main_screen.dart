@@ -37,7 +37,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final sessionId = SessionDataProvider().read();
+
     final provider = context.read<MoviesProvider>();
 
 

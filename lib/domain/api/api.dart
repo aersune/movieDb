@@ -18,6 +18,7 @@ class Api {
   // &page=2
   // ?language=ru-RU
   static final apiKey = dotenv.get('API_KEY');
+
   static final dio = Dio();
   // https://api.themoviedb.org/3/account?api_key=blahblahblah&session_id=xxxxxxxxxxx
 
@@ -151,6 +152,8 @@ class Api {
       throw Exception('Error ${response.statusCode}');
     }
   }
+
+
 
 
 

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movie_db/domain/models/credits_model.dart';
@@ -10,10 +12,17 @@ import '../../../domain/bloc/movies_db/movies_db_bloc.dart';
 import '../../../domain/models/movie_details.dart';
 import '../widgets/actors_images_widget.dart';
 
-class DetailsScreen extends StatelessWidget {
+class DetailsScreen extends StatefulWidget {
   const DetailsScreen({super.key, this.inSearch = false});
 
   final bool inSearch;
+
+  @override
+  State<DetailsScreen> createState() => _DetailsScreenState();
+}
+
+class _DetailsScreenState extends State<DetailsScreen> {
+  late Future<bool> _isFavorite;
 
   String convertMinute(minutes) {
     int hours = minutes ~/ 60;
@@ -26,14 +35,15 @@ class DetailsScreen extends StatelessWidget {
       throw Exception('Could not launch $url');
     }
   }
-///awdawd
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final provider = context.read<MoviesProvider>();
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         context.read<MoviesDbBloc>().add(MoviesLoadEvent());
-        // context.go('/home');
+
         context.read<MoviesProvider>().goFirstPage(context);
         return false;
       },
@@ -50,7 +60,19 @@ class DetailsScreen extends StatelessWidget {
                       final MovieDetails? details = state.movieDetails;
                       final Credits? credits = state.credits;
 
-                      print("${details?.id} id");
+                      void toggleFavorite(bool isFav) async {
+
+                         provider.setFav(mediaId: details!.id!.toInt(), mediaType: 'movie', isFav: !isFav);
+                        setState(() {
+                          _isFavorite = provider.isFavorite(mediaId:  details.id!.toInt(), mediaType: 'movies');
+                        });
+                      }
+
+                      _isFavorite = context.read<MoviesProvider>().isFavorite(
+                            mediaId: details!.id!.toInt(),
+                            mediaType: 'movies',
+                          );
+
                       return Column(
                         children: [
                           Container(
@@ -58,7 +80,9 @@ class DetailsScreen extends StatelessWidget {
                             height: 570,
                             decoration: BoxDecoration(
                               image: DecorationImage(
-                                  image: NetworkImage('https://image.tmdb.org/t/p/w500${details?.posterPath}'),
+                                  image: NetworkImage(details.posterPath!.isNotEmpty
+                                      ? 'https://image.tmdb.org/t/p/w500${details.posterPath}'
+                                      : "http://via.placeholder.com/350x150"),
                                   fit: BoxFit.cover),
                             ),
                             child: Stack(
@@ -81,13 +105,13 @@ class DetailsScreen extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "${details?.title}",
+                                        "${details.title}",
                                         style: AppStyle.titleStyle.copyWith(fontSize: 30),
                                       ),
                                       Text(
-                                          "${details?.releaseDate?.substring(0, 4)} · ${convertMinute(details?.runtime)}",
+                                          "${details.releaseDate!.isNotEmpty ? details.releaseDate?.substring(0, 4) : ''} · ${convertMinute(details?.runtime)}",
                                           style: AppStyle.normalStyle.copyWith(fontSize: 12)),
-                                      details!.productionCountries!.isNotEmpty
+                                      details.productionCountries!.isNotEmpty
                                           ? Text(
                                               "${details.productionCountries?[0].name} · ${details.genres?.map((e) => e.name).join(', ')}",
                                               style: AppStyle.normalStyle.copyWith(fontSize: 11, letterSpacing: 0.7))
@@ -98,9 +122,10 @@ class DetailsScreen extends StatelessWidget {
                                         children: [
                                           InkWell(
                                             onTap: () {
-                                              _launchUrl(Uri.parse('https://www.youtube.com/watch?v=${state.ytInfo!.results?[0].keyYt}'));
+                                              _launchUrl(Uri.parse(
+                                                  'https://www.youtube.com/watch?v=${state.ytInfo!.results?[0].keyYt}'));
                                               // await launchUrl();
-                                            } ,
+                                            },
                                             child: Container(
                                               width: size.width * .65,
                                               height: 50,
@@ -125,11 +150,38 @@ class DetailsScreen extends StatelessWidget {
                                               ),
                                             ),
                                           ),
-                                          const Icon(
-                                            Icons.favorite_border,
-                                            size: 30,
-                                            color: AppColors.whiteColor,
-                                          ),
+                                          FutureBuilder<bool>(
+                                              future: _isFavorite,
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                                  return const Center(
+                                                    child: CupertinoActivityIndicator(color: AppColors.lightColor,),
+                                                  );
+                                                } else if (snapshot.hasError) {
+                                                  {
+                                                    if (kDebugMode) {
+                                                      print('Error: ${snapshot.error}');
+                                                    }
+                                                    return const Text(
+                                                      'Error:',
+                                                      style: TextStyle(color: Colors.white),
+                                                    );
+                                                  }
+                                                } else {
+                                                  final isFavorite = snapshot.data!;
+
+
+                                                  return IconButton(
+                                                      onPressed: () {
+                                                        toggleFavorite(isFavorite);
+                                                      },
+                                                      icon: Icon(
+                                                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                                                        size: 30,
+                                                        color: isFavorite ? AppColors.lightColor : AppColors.whiteColor,
+                                                      ));
+                                                }
+                                              }),
                                           const Icon(
                                             Icons.more_vert,
                                             size: 30,
@@ -144,7 +196,7 @@ class DetailsScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 15),
-                          ratingWidget(details?.voteAverage ?? 0.0),
+                          ratingWidget(details.voteAverage ?? 0.0),
                           const SizedBox(height: 15),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -154,7 +206,7 @@ class DetailsScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${details?.overview}",
+                                  "${details.overview}",
                                   style: AppStyle.normalStyle,
                                   maxLines: 8,
                                   overflow: TextOverflow.ellipsis,
@@ -166,7 +218,7 @@ class DetailsScreen extends StatelessWidget {
                                         children: [
                                           creditsWidget(
                                               title: 'Directing ',
-                                              body: credits!.crew!
+                                              body: credits.crew!
                                                   .where((el) => el.department == "Directing")
                                                   .map((e) => e.name)
                                                   .join(',  ')),
@@ -218,7 +270,6 @@ class DetailsScreen extends StatelessWidget {
                       );
                     }
                     if (state is MoviesErrorState) {
-
                       return Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.max,
@@ -248,7 +299,7 @@ class DetailsScreen extends StatelessWidget {
                       // Navigator.pop(context);
 
                       // context.go('/home');
-                      !inSearch
+                      !widget.inSearch
                           ? context.read<MoviesDbBloc>().add(MoviesLoadEvent())
                           : context
                               .read<MoviesDbBloc>()

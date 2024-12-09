@@ -28,7 +28,7 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             Text(
-              'welcome back, you\'ve beem missed!',
+              'welcome back, you\'ve been missed!',
               style: GoogleFonts.dancingScript(
                 fontSize: 25,
                 color: AppColors.whiteColor,
@@ -106,35 +106,35 @@ class LoginScreen extends StatelessWidget {
 class _AuthButtonWidget extends StatelessWidget {
   const _AuthButtonWidget({
     super.key,
-
   });
-
-
 
   @override
   Widget build(BuildContext context) {
-    final model = AuthProvider.watch(context)?.model;
-    final onPressed = model?.canStartAuth == true  ?  () => model?.auth(context) : null;
-    final child = model?.isAuthProgress == true ? const SizedBox(
-      height: 27,
-        width: 27,
-        child:  CircularProgressIndicator(
-          strokeWidth: 2,
-          color: AppColors.whiteColor,)) :const Text(
-      'Sign in',
-      style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-    );
+    final model = AuthProvider.read(context)?.model;
+
+    final child = model?.isAuthProgress == true
+        ? const SizedBox(
+            height: 27,
+            width: 27,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.whiteColor,
+            ))
+        : const Text(
+            'Sign in',
+            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+          );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () => model?.auth(context),
+        onTap: () {
+          model?.auth(context);
+        },
         child: Ink(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(color: AppColors.lightColor, borderRadius: BorderRadius.circular(12)),
-          child:  Center(
-              child: child
-          ),
+          child: Center(child: child),
         ),
       ),
     );
@@ -147,7 +147,7 @@ class _ErrorMessageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final errorMessage = AuthProvider.watch(context)?.model.errorMessage;
-    if(errorMessage == null) return const SizedBox.shrink();
+    if (errorMessage == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Text(
@@ -157,4 +157,3 @@ class _ErrorMessageWidget extends StatelessWidget {
     );
   }
 }
-

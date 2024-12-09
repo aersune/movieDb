@@ -13,8 +13,12 @@ class ActorsAvatars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  SizedBox(
-      height: 165,
+    return  ConstrainedBox(
+      constraints: BoxConstraints(
+
+        maxHeight: MediaQuery.of(context).size.height * .24,),
+
+
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         separatorBuilder: (context, index) => const SizedBox(width: 10),
@@ -40,6 +44,8 @@ class ActorsAvatars extends StatelessWidget {
                 "${cast?[i].character?.replaceAll('/', "\n-")}",
                 style: AppStyle.normalStyle.copyWith(fontSize: 15, color: AppColors.grayText, ),
               textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis
               ),
             ],
           );
