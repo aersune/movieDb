@@ -70,6 +70,6 @@
     <h2>Contributing</h2>
     <p>If you would like to contribute to this project, please fork the repository and submit a pull request. We appreciate your contributions!</p>
     <h2>Contact</h2>
-    <p>If you have any questions or feedback, feel free to reach out to <a href="mailto:your-email@example.com">Your Name</a>.</p>
+    <p>If you have any questions or feedback, feel free to reach out to <a href="mailto:aersune@gmail.com">Javokhir</a>.</p>
 </body>
 </html>
