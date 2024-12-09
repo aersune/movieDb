@@ -34,7 +34,18 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  icons_launcher: ^1.1.9
 
+flutter_icons:
+  android: "Movily"
+  image_path_web: 'assets/icon.png'
+  ios: true
+  web: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+#flutter pub run icons_launcher:create
 
 
 
