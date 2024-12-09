@@ -1,6 +1,6 @@
 
 <body>
-    <h1 style="font-size: 30px;"> Movie App </h1>
+    <h1 style="font-size: 30px;"> Movies App </h1>
   <img src="https://github.com/user-attachments/assets/83249606-1b1d-4f8b-9f41-2f582ebcb5d8" alt="App Banner" style="width: 500px; height: auto;">
     <p>Welcome to the Movie App! This application provides comprehensive details about movies, animated films, TV series, and shows using the powerful <a href="https://www.themoviedb.org/">The Movie Database (TMDb)</a> API. The app offers an extensive list of titles along with detailed information about each one.</p>
     <h2>Features</h2>
